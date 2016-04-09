@@ -19,17 +19,17 @@ class SwiftyTransport: NSObject {
     // MARK: Locations
     
     /**
-    Returns the matching locations for the given parameters. Either query or ( x and y ) are required.
-    
-    The locations in the response are scored to determine which is the most exact location.
-    
-    This method can return a refine response, what means that the request has to be redone.
-    
+     Returns the matching locations for the given parameters. Either query or ( x and y ) are required.
+     
+     The locations in the response are scored to determine which is the most exact location.
+     
+     This method can return a refine response, what means that the request has to be redone.
+     
      - parameter query: A search query, e.g. "Bern, Bahnhof"
      - parameter coordinates: A Location to list the nearest locations
      - parameter type: Only with query, type of the location, see LocationType
      - parameter transportations: Only with coordinates, type of transportations leaving from location, see Transportations
-    */
+     */
     func getLocations(query: String?, coordinates:(x: Float, y: Float)?, type: LocationType?, transportations: [Transportations]?){
         
         let resource = "locations"
@@ -68,7 +68,7 @@ class SwiftyTransport: NSObject {
         let url = NSURL(string: urlString)
         let request = NSURLRequest(URL: url!)
         let session = NSURLSession.sharedSession()
-
+        
         session.dataTaskWithRequest(request) { (data, response, error) -> Void in
             guard let response = response as? NSHTTPURLResponse where response.statusCode == 200 else {
                 self.delegate.didFailWithError(nil)
@@ -84,11 +84,11 @@ class SwiftyTransport: NSObject {
                 self.delegate.didFailWithError(nil)
                 return
             }
-
-            self.delegate.didGetLocationsData(data!)
-        }.resume()
+            
+            self.delegate.didGetLocationsData?(data!)
+            }.resume()
     }
-
+    
     /**
      getLocations by Query
      
@@ -101,35 +101,35 @@ class SwiftyTransport: NSObject {
     
     /**
      getLocations by Coordinates
-
+     
      - parameter coordinates: A Location to list the nearest locations
      - parameter transportations: Type of transportations leaving from location, see Transportations
      */
     func getLocationsByCoordinates(coordinates: (x: Float, y: Float), transportations: [Transportations]?) {
         getLocations(nil, coordinates: coordinates, type: nil, transportations: transportations)
     }
-
+    
     
     // MARK: Connections
     
     /**
-    Returns the next connections from a location to another.
-    
-    - parameter from: Specifies the departure location of the connection
-    - parameter to: Specifies the arrival location of the connection	
-    - parameter via: Specifies up to five via locations.
-    - parameter date: Date of the connection, in the format YYYY-MM-DD
-    - parameter time: Time of the connection, in the format hh:mm
-    - parameter isArrivalTime: If set to true the passed date and time is the arrival time
-    - parameter transportations: Type of transportations leaving from location, see Transportations
-    - parameter limit: 1 - 6. Specifies the number of connections to return. If several connections depart at the same time they are counted as 1.
-    - parameter page: 0 - 10. Allows pagination of connections. Zero-based, so first page is 0, second is 1, third is 2 and so on.
-    - parameter direct: Defaults to false, if set to true only direct connections are allowed
-    - parameter sleeper: Defaults to false, if set to true only night trains containing beds are allowed, implies direct=1
-    - parameter couchette: Defaults to false, if set to true only night trains containing couchettes are allowed, implies direct=1
-    - parameter bike: Defaults to false, if set to true only trains allowing the transport of bicycles are allowed
-    - parameter accessibility: Sets the level of accessibility required, see AccessibilityType
-    */
+     Returns the next connections from a location to another.
+     
+     - parameter from: Specifies the departure location of the connection
+     - parameter to: Specifies the arrival location of the connection
+     - parameter via: Specifies up to five via locations.
+     - parameter date: Date of the connection, in the format YYYY-MM-DD
+     - parameter time: Time of the connection, in the format hh:mm
+     - parameter isArrivalTime: If set to true the passed date and time is the arrival time
+     - parameter transportations: Type of transportations leaving from location, see Transportations
+     - parameter limit: 1 - 6. Specifies the number of connections to return. If several connections depart at the same time they are counted as 1.
+     - parameter page: 0 - 10. Allows pagination of connections. Zero-based, so first page is 0, second is 1, third is 2 and so on.
+     - parameter direct: Defaults to false, if set to true only direct connections are allowed
+     - parameter sleeper: Defaults to false, if set to true only night trains containing beds are allowed, implies direct=1
+     - parameter couchette: Defaults to false, if set to true only night trains containing couchettes are allowed, implies direct=1
+     - parameter bike: Defaults to false, if set to true only trains allowing the transport of bicycles are allowed
+     - parameter accessibility: Sets the level of accessibility required, see AccessibilityType
+     */
     func getConnections(from: String, to: String, vias: [String]?, date: String?, time: String?, isArrivalTime: Bool?, transportations: [Transportations]?, limit: Int?, page: Int?, direct: Bool?, sleeper: Bool?, couchette: Bool?, bike: Bool?, accessibility: AccessibilityType?) throws {
         
         let resource = "connections"
@@ -217,8 +217,8 @@ class SwiftyTransport: NSObject {
                     return
                 }
                 
-                self.delegate.didGetConnectionsData(data!)
-            }.resume()
+                self.delegate.didGetConnectionsData?(data!)
+                }.resume()
         } else {
             throw SwiftyTransportError.InvalidURL
         }
@@ -237,14 +237,14 @@ class SwiftyTransport: NSObject {
     // MARK: Stationboard
     
     /**
-    Returns the next connections leaving from a specific location.
-    
-    - parameter station: Specifies the location of which a stationboard should be returned	
-    - parameter id: The id of the station whose stationboard should be returned. Alternative to the station parameter; one of these two is required. If both an id and a station are specified the id has precedence.
-    - parameter limit: Number of departing connections to return. This is not a hard limit - if multiple connections leave at the same time it'll return any connections that leave at the same time as the last connection within the limit.
-    - parameter transportations: Type of transportations leaving from location, see Transportations
-    - parameter datetime: Date and time of departing connections, in the format YYYY-MM-DD hh:mm.
-    */
+     Returns the next connections leaving from a specific location.
+     
+     - parameter station: Specifies the location of which a stationboard should be returned
+     - parameter id: The id of the station whose stationboard should be returned. Alternative to the station parameter; one of these two is required. If both an id and a station are specified the id has precedence.
+     - parameter limit: Number of departing connections to return. This is not a hard limit - if multiple connections leave at the same time it'll return any connections that leave at the same time as the last connection within the limit.
+     - parameter transportations: Type of transportations leaving from location, see Transportations
+     - parameter datetime: Date and time of departing connections, in the format YYYY-MM-DD hh:mm.
+     */
     func getStationboard(station: String?, id: String?, limit: Int?, transportations: [Transportations]?, datetime: String?) throws {
         guard (station != nil) || (id != nil) else {
             throw SwiftyTransportError.InvalidParameters
@@ -305,8 +305,8 @@ class SwiftyTransport: NSObject {
                 return
             }
             
-            self.delegate.didGetStationboardData(data!)
-        }.resume()
+            self.delegate.didGetStationboardData?(data!)
+            }.resume()
     }
     
     /**
@@ -359,6 +359,7 @@ enum SwiftyTransportError: ErrorType {
     case InvalidURL
 }
 
+@objc
 protocol SwiftyTransportDelegate {
     optional func didGetLocationsData(data: NSData)
     optional func didGetConnectionsData(data: NSData)
