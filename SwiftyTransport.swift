@@ -360,8 +360,8 @@ enum SwiftyTransportError: ErrorType {
 }
 
 protocol SwiftyTransportDelegate {
-    func didGetLocationsData(data: NSData)
-    func didGetConnectionsData(data: NSData)
-    func didGetStationboardData(data: NSData)
+    optional func didGetLocationsData(data: NSData)
+    optional func didGetConnectionsData(data: NSData)
+    optional func didGetStationboardData(data: NSData)
     func didFailWithError(error: NSError?)
 }
